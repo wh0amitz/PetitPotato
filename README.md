@@ -1,2 +1,2 @@
 # PetitPotato
-Local privilege escalation via PetitPotam
+Local privilege escalation via PetitPotam (Abusing impersonate privileges)
