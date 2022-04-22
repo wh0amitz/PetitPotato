@@ -16,12 +16,26 @@ DWORD WINAPI LaunchPetitNamedPipeServer(LPVOID lpParam);
 void GetSystem(HANDLE hNamedPipe, LPWSTR Command);
 void PetitPotamConnect(DWORD EfsID);
 
-
 void _tmain(int argc, TCHAR* argv[])
 {
     if (argc != 3)
     {
-        printf("Usage: %S [EfsID] [Command]\n", argv[0]);
+        printf("\nUsage: %S [EfsID] [Command]\n\n", argv[0]);
+        printf("The available EfsIDs are as follows: \n");
+        printf("    [0] EfsRpcOpenFileRaw\n");
+        printf("    [1] EfsRpcEncryptFileSrv\n");
+        printf("    [2] EfsRpcDecryptFileSrv\n");
+        printf("    [3] EfsRpcQueryUsersOnFile\n");
+        printf("    [4] EfsRpcQueryRecoveryAgents\n");
+        printf("    [5] EfsRpcRemoveUsersFromFile (Failed)\n");
+        printf("    [6] EfsRpcAddUsersToFile\n");
+        printf("    [7] EfsRpcFileKeyInfo\n");
+        printf("    [8] EfsRpcDuplicateEncryptionInfoFile (Failed)\n");
+        printf("    [9] EfsRpcAddUsersToFileEx\n");
+        printf("    [10] EfsRpcFileKeyInfoEx (Failed)\n");
+        printf("    [11] EfsRpcGetEncryptedFileMetadata (Failed)\n");
+        printf("    [12] EfsRpcSetEncryptedFileMetadata (Failed)\n");
+
         return;
     }
 
