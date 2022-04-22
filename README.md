@@ -53,9 +53,9 @@ PetitPotato.exe [EfsID] [Command]
 PetitPotato.exe 3 whoami
 ```
 
-![image-20220422114209110](.\images\image-20220422114209110.png)
+![image-20220422114209110](/images/image-20220422114209110.png)
 
-![image-20220422132713870](.\images\image-20220422132713870.png)
+![image-20220422132713870](/images/image-20220422132713870.png)
 
 ## Link
 
