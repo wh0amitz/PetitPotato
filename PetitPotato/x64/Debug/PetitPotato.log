@@ -1,0 +1,4 @@
+﻿  PetitPotato.cpp
+C:\Users\whoami\Desktop\Cyber Tools\Privilege Escalation\Potato Family\PetitPotato\PetitPotato\PetitPotato.cpp(21,1): warning C4326: “wmain”的返回类型应为“int”而非“void”
+C:\Users\whoami\Desktop\Cyber Tools\Privilege Escalation\Potato Family\PetitPotato\PetitPotato\PetitPotato.cpp(83,12): warning C4101: “hProcess”: 未引用的局部变量
+  PetitPotato.vcxproj -> C:\Users\whoami\Desktop\Cyber Tools\Privilege Escalation\Potato Family\PetitPotato\x64\Debug\PetitPotato.exe
