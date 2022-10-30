@@ -4,6 +4,6 @@
 .\ms-efsr.idl(72): warning MIDL2480: parameter/field with range is used in conformance expression. Suggest move range to size_is/max_is argument  : [ Field 'StructMember2' of Struct 'Struct_462_t' ( Parameter 'arg_2' ) ]
   ms-efsr_c.c
   PetitPotato.cpp
-C:\Users\whoami\Desktop\Cyber Tools\Privilege Escalation\Potato Family\PetitPotato\PetitPotato\PetitPotato.cpp(21,1): warning C4326: “wmain”的返回类型应为“int”而非“void”
-C:\Users\whoami\Desktop\Cyber Tools\Privilege Escalation\Potato Family\PetitPotato\PetitPotato\PetitPotato.cpp(98,12): warning C4101: “hProcess”: 未引用的局部变量
+C:\Users\whoami\Desktop\Cyber Tools\Privilege Escalation\Potato Family\PetitPotato\PetitPotato\PetitPotato.cpp(29,1): warning C4326: “wmain”的返回类型应为“int”而非“void”
+C:\Users\whoami\Desktop\Cyber Tools\Privilege Escalation\Potato Family\PetitPotato\PetitPotato\PetitPotato.cpp(106,12): warning C4101: “hProcess”: 未引用的局部变量
   PetitPotato.vcxproj -> C:\Users\whoami\Desktop\Cyber Tools\Privilege Escalation\Potato Family\PetitPotato\x64\Debug\PetitPotato.exe

