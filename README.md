@@ -68,9 +68,9 @@ nt authority\system
 C:\Windows\system32>
 ```
 
-![image-20221030165055659](.\images\image-20221030165055659.png)
+![image-20221030165055659](/images/image-20221030165055659.png)
 
-![image-20221030165622668](.\images\image-20221030165622668.png)
+![image-20221030165622668](/images/image-20221030165622668.png)
 
 ## Link
 
