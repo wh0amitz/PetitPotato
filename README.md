@@ -23,16 +23,16 @@ Here are all the APIs I found that have a FileName parameter, and most of them c
 
 |                MS-EFSR API                 | EfsID |
 | :----------------------------------------: | :---: |
-|           **EfsRpcOpenFileRaw**            |   0   |
-|          **EfsRpcEncryptFileSrv**          |   1   |
-|          **EfsRpcDecryptFileSrv**          |   2   |
-|         **EfsRpcQueryUsersOnFile**         |   3   |
-|       **EfsRpcQueryRecoveryAgents**        |   4   |
+|             EfsRpcOpenFileRaw              |   0   |
+|            EfsRpcEncryptFileSrv            |   1   |
+|            EfsRpcDecryptFileSrv            |   2   |
+|           EfsRpcQueryUsersOnFile           |   3   |
+|         EfsRpcQueryRecoveryAgents          |   4   |
 |     EfsRpcRemoveUsersFromFile (Failed)     |   5   |
-|          **EfsRpcAddUsersToFile**          |   6   |
-|           **EfsRpcFileKeyInfo**            |   7   |
+|            EfsRpcAddUsersToFile            |   6   |
+|             EfsRpcFileKeyInfo              |   7   |
 | EfsRpcDuplicateEncryptionInfoFile (Failed) |   8   |
-|         **EfsRpcAddUsersToFileEx**         |   9   |
+|           EfsRpcAddUsersToFileEx           |   9   |
 |        EfsRpcFileKeyInfoEx (Failed)        |  10   |
 |  EfsRpcGetEncryptedFileMetadata (Failed)   |  11   |
 |  EfsRpcSetEncryptedFileMetadata (Failed)   |  12   |
