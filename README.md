@@ -19,25 +19,6 @@ Such APIs can specify a UNC path via the FileName parameter to open encrypted ob
 
 If we can call the `EfsRpcOpenFileRaw` API to force the local computer to connect to the malicious named pipe we created, then we can impersonate the named pipe client process and eventually gain the SYSTEKM privilege.
 
-Here are all the APIs I found that have a FileName parameter, and most of them can be used for privilege escalation (but when I tested locally, some API calls failed, maybe I made a mistake somewhere):
-
-|                MS-EFSR API                 | EfsID |
-| :----------------------------------------: | :---: |
-|             EfsRpcOpenFileRaw              |   0   |
-|            EfsRpcEncryptFileSrv            |   1   |
-|            EfsRpcDecryptFileSrv            |   2   |
-|           EfsRpcQueryUsersOnFile           |   3   |
-|         EfsRpcQueryRecoveryAgents          |   4   |
-|     EfsRpcRemoveUsersFromFile (Failed)     |   5   |
-|            EfsRpcAddUsersToFile            |   6   |
-|             EfsRpcFileKeyInfo              |   7   |
-| EfsRpcDuplicateEncryptionInfoFile (Failed) |   8   |
-|           EfsRpcAddUsersToFileEx           |   9   |
-|        EfsRpcFileKeyInfoEx (Failed)        |  10   |
-|  EfsRpcGetEncryptedFileMetadata (Failed)   |  11   |
-|  EfsRpcSetEncryptedFileMetadata (Failed)   |  12   |
-
-
 ## Usage
 
 ```powershell
