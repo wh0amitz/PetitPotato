@@ -53,9 +53,15 @@ C:\Windows\system32>
 
 ![image-20221030165622668](/images/image-20221030165622668.png)
 
+PetitPotam does not work on newer versions of Windows due to the limitations of related patches. However, setting AuthnLevel to RPC_C_AUTHN_LEVEL_PKT_PRIVACY via RpcBindingSetAuthInfoW before calling EFS works on latest systems.
+At present, the project can perfectly elevate to SYSTEM authority on Windows 21H2 10.0.20348.1547
+
+![image-20221030165055659](/images/image-20221030165155659.png)
+
 ## Link
 
 - https://github.com/topotam/PetitPotam
 - https://itm4n.github.io/printspoofer-abusing-impersonate-privileges/
 - https://itm4n.github.io/from-rpcview-to-petitpotam/
+- https://github.com/zcgonvh/EfsPotato/pull/5
 
