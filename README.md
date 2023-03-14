@@ -53,7 +53,10 @@ C:\Windows\system32>
 
 ![image-20221030165622668](/images/image-20221030165622668.png)
 
-PetitPotam does not work on newer versions of Windows due to the limitations of related patches. However, setting AuthnLevel to RPC_C_AUTHN_LEVEL_PKT_PRIVACY via RpcBindingSetAuthInfoW before calling EFS works on latest systems.
+## Update on 2023/03/14
+
+PetitPotam does not work on newer versions of Windows due to the limitations of related patches. However, setting AuthnLevel to `RPC_C_AUTHN_LEVEL_PKT_PRIVACY` via `RpcBindingSetAuthInfoW` before calling EFS works on latest systems.
+
 At present, the project can perfectly elevate to SYSTEM authority on Windows 21H2 10.0.20348.1547
 
 ![image-20221030165055659](/images/image-20221030165155659.png)
