@@ -147,9 +147,6 @@
     <ClInclude Include="ms-dtyp_h.h" />
     <ClInclude Include="ms-efsr_h.h" />
   </ItemGroup>
-  <ItemGroup>
-    <Midl Include="ms-efsr.idl" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

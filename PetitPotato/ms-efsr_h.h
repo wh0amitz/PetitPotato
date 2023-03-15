@@ -1,4 +1,4 @@
-
+#define WIN32_LEAN_AND_MEAN
 
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
@@ -48,213 +48,337 @@
 
 /* Forward Declarations */ 
 
+/* header files for imported files */
+#include "ms-dtyp_h.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif 
 
 
-#ifndef __DefaultIfName_INTERFACE_DEFINED__
-#define __DefaultIfName_INTERFACE_DEFINED__
+#ifndef __efsrpc_INTERFACE_DEFINED__
+#define __efsrpc_INTERFACE_DEFINED__
 
-/* interface DefaultIfName */
+/* interface efsrpc */
 /* [version][uuid] */ 
 
-typedef struct Struct_68_t
+typedef /* [context_handle] */ void *PEXIMPORT_CONTEXT_HANDLE;
+
+typedef struct pipe_EFS_EXIM_PIPE
     {
-    unsigned char StructMember0[ 6 ];
-    } 	Struct_68_t;
+    void (__RPC_USER * pull) (
+        char * state,
+        unsigned char * buf,
+        unsigned long esize,
+        unsigned long * ecount );
+    void (__RPC_USER * push) (
+        char * state,
+        unsigned char * buf,
+        unsigned long ecount );
+    void (__RPC_USER * alloc) (
+        char * state,
+        unsigned long bsize,
+        unsigned char * * buf,
+        unsigned long * bcount );
+    char * state;
+    } 	EFS_EXIM_PIPE;
 
-typedef struct Struct_100_t
+typedef struct _EFS_RPC_BLOB
     {
-    unsigned char StructMember0;
-    unsigned char StructMember1;
-    struct Struct_68_t StructMember2;
-    /* [size_is] */ long StructMember3[ 1 ];
-    } 	Struct_100_t;
+    /* [range] */ DWORD cbData;
+    /* [size_is] */ unsigned char *bData;
+    } 	EFS_RPC_BLOB;
 
-typedef struct Struct_136_t
+typedef struct _EFS_RPC_BLOB *PEFS_RPC_BLOB;
+
+typedef /* [public] */ struct __MIDL_efsrpc_0001
     {
-    long StructMember0;
-    /* [size_is][unique] */ unsigned char *StructMember1;
-    } 	Struct_136_t;
+    DWORD EfsVersion;
+    } 	EFS_COMPATIBILITY_INFO;
 
-typedef struct Struct_152_t
+typedef unsigned int ALG_ID;
+
+typedef struct _EFS_HASH_BLOB
     {
-    long StructMember0;
-    /* [unique] */ struct Struct_100_t *StructMember1;
-    /* [unique] */ struct Struct_136_t *StructMember2;
-    /* [string][unique] */ wchar_t *StructMember3;
-    } 	Struct_152_t;
+    /* [range] */ DWORD cbData;
+    /* [size_is] */ unsigned char *bData;
+    } 	EFS_HASH_BLOB;
 
-typedef struct Struct_220_t
+typedef struct _ENCRYPTION_CERTIFICATE_HASH
     {
-    long StructMember0;
-    /* [size_is][unique] */ struct Struct_152_t **StructMember1;
-    } 	Struct_220_t;
+    DWORD cbTotalLength;
+    RPC_SID *UserSid;
+    EFS_HASH_BLOB *Hash;
+    /* [string] */ wchar_t *lpDisplayInformation;
+    } 	ENCRYPTION_CERTIFICATE_HASH;
 
-typedef struct Struct_266_t
+typedef struct _ENCRYPTION_CERTIFICATE_HASH_LIST
     {
-    long StructMember0;
-    long StructMember1;
-    /* [size_is][unique] */ unsigned char *StructMember2;
-    } 	Struct_266_t;
+    /* [range] */ DWORD nCert_Hash;
+    /* [size_is][size_is] */ ENCRYPTION_CERTIFICATE_HASH **Users;
+    } 	ENCRYPTION_CERTIFICATE_HASH_LIST;
 
-typedef struct Struct_282_t
+typedef struct _CERTIFICATE_BLOB
     {
-    long StructMember0;
-    /* [unique] */ struct Struct_100_t *StructMember1;
-    /* [unique] */ struct Struct_266_t *StructMember2;
-    } 	Struct_282_t;
+    DWORD dwCertEncodingType;
+    /* [range] */ DWORD cbData;
+    /* [size_is] */ unsigned char *bData;
+    } 	EFS_CERTIFICATE_BLOB;
 
-typedef struct Struct_346_t
+typedef struct _ENCRYPTION_CERTIFICATE
     {
-    long StructMember0;
-    /* [size_is][unique] */ struct Struct_282_t **StructMember1;
-    } 	Struct_346_t;
+    DWORD cbTotalLength;
+    RPC_SID *UserSid;
+    EFS_CERTIFICATE_BLOB *CertBlob;
+    } 	ENCRYPTION_CERTIFICATE;
 
-typedef struct Struct_392_t
+typedef struct _ENCRYPTION_CERTIFICATE_LIST
     {
-    long StructMember0;
-    /* [size_is][unique] */ unsigned char *StructMember1;
-    } 	Struct_392_t;
+    /* [range] */ DWORD nUsers;
+    /* [size_is][size_is] */ ENCRYPTION_CERTIFICATE **Users;
+    } 	ENCRYPTION_CERTIFICATE_LIST;
 
-typedef struct Struct_462_t
+typedef struct _ENCRYPTED_FILE_METADATA_SIGNATURE
     {
-    /* [range] */ long StructMember0;
-    /* [range] */ long StructMember1;
-    /* [size_is][unique] */ unsigned char *StructMember2;
-    } 	Struct_462_t;
+    DWORD dwEfsAccessType;
+    ENCRYPTION_CERTIFICATE_HASH_LIST *CertificatesAdded;
+    ENCRYPTION_CERTIFICATE *EncryptionCertificate;
+    EFS_RPC_BLOB *EfsStreamSignature;
+    } 	ENCRYPTED_FILE_METADATA_SIGNATURE;
 
-typedef struct Struct_492_t
+typedef /* [public] */ struct __MIDL_efsrpc_0002
     {
-    long StructMember0;
-    /* [unique] */ struct Struct_220_t *StructMember1;
-    /* [unique] */ struct Struct_282_t *StructMember2;
-    /* [unique] */ struct Struct_392_t *StructMember3;
-    } 	Struct_492_t;
+    DWORD dwVersion;
+    unsigned long Entropy;
+    ALG_ID Algorithm;
+    unsigned long KeyLength;
+    } 	EFS_KEY_INFO;
 
-long Proc0_EfsRpcOpenFileRaw_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [context_handle][out] */ void **arg_1,
-    /* [string][in] */ wchar_t *arg_2,
-    /* [in] */ long arg_3);
+typedef /* [public] */ struct __MIDL_efsrpc_0003
+    {
+    DWORD dwDecryptionError;
+    DWORD dwHashOffset;
+    DWORD cbHash;
+    } 	EFS_DECRYPTION_STATUS_INFO;
 
-long Proc1_EfsRpcReadFileRaw_Downlevel( 
-    /* [context_handle][in] */ void *arg_0,
-    /* [out] */ unsigned char *arg_1);
+typedef /* [public] */ struct __MIDL_efsrpc_0004
+    {
+    BOOL bHasCurrentKey;
+    DWORD dwEncryptionError;
+    } 	EFS_ENCRYPTION_STATUS_INFO;
 
-long Proc2_EfsRpcWriteFileRaw_Downlevel( 
-    /* [context_handle][in] */ void *arg_0,
-    /* [in] */ unsigned char *arg_1);
+typedef struct _ENCRYPTION_PROTECTOR
+    {
+    DWORD cbTotalLength;
+    RPC_SID *UserSid;
+    /* [string] */ wchar_t *lpProtectorDescriptor;
+    } 	ENCRYPTION_PROTECTOR;
 
-void Proc3_EfsRpcCloseRaw_Downlevel( 
-    /* [context_handle][out][in] */ void **arg_0);
+typedef struct _ENCRYPTION_PROTECTOR *PENCRYPTION_PROTECTOR;
 
-long Proc4_EfsRpcEncryptFileSrv_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1);
+typedef struct _ENCRYPTION_PROTECTOR_LIST
+    {
+    DWORD nProtectors;
+    /* [size_is] */ PENCRYPTION_PROTECTOR *pProtectors;
+    } 	ENCRYPTION_PROTECTOR_LIST;
 
-long Proc5_EfsRpcDecryptFileSrv_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [in] */ long arg_2);
+typedef struct _ENCRYPTION_PROTECTOR_LIST *PENCRYPTION_PROTECTOR_LIST;
 
-long Proc6_EfsRpcQueryUsersOnFile_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [ref][out] */ struct Struct_220_t **arg_2);
+long EfsRpcOpenFileRaw( 
+    /* [in] */ handle_t binding_h,
+    /* [out] */ PEXIMPORT_CONTEXT_HANDLE *hContext,
+    /* [string][in] */ wchar_t *FileName,
+    /* [in] */ long Flags);
 
-long Proc7_EfsRpcQueryRecoveryAgents_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [ref][out] */ struct Struct_220_t **arg_2);
+long EfsRpcReadFileRaw( 
+    /* [in] */ PEXIMPORT_CONTEXT_HANDLE hContext,
+    /* [out] */ EFS_EXIM_PIPE *EfsOutPipe);
 
-long Proc8_EfsRpcRemoveUsersFromFile_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [in] */ struct Struct_220_t *arg_2);
+long EfsRpcWriteFileRaw( 
+    /* [in] */ PEXIMPORT_CONTEXT_HANDLE hContext,
+    /* [in] */ EFS_EXIM_PIPE *EfsInPipe);
 
-long Proc9_EfsRpcAddUsersToFile_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [in] */ struct Struct_346_t *arg_2);
+void EfsRpcCloseRaw( 
+    /* [out][in] */ PEXIMPORT_CONTEXT_HANDLE *hContext);
 
-long Proc10_EfsRpcFileKeyInfoEx_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [unique][in] */ struct Struct_282_t *arg_1,
-    /* [in] */ long arg_2,
-    /* [in] */ long arg_3);
+long EfsRpcEncryptFileSrv( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName);
 
-long Proc11_EfsRpcFileKeyInfoEx_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [string][in] */ wchar_t *arg_2,
-    /* [in] */ long arg_3,
-    /* [in] */ long arg_4,
-    /* [unique][in] */ struct Struct_392_t *arg_5,
-    /* [in] */ long arg_6);
+long EfsRpcDecryptFileSrv( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName,
+    /* [in] */ unsigned long OpenFlag);
 
-long Proc12_EfsRpcFileKeyInfo_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [in] */ long arg_2,
-    /* [ref][out] */ struct Struct_392_t **arg_3);
+DWORD EfsRpcQueryUsersOnFile( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName,
+    /* [out] */ ENCRYPTION_CERTIFICATE_HASH_LIST **Users);
 
-long Proc13_EfsRpcDuplicateEncryptionInfoFile_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [string][in] */ wchar_t *arg_2,
-    /* [in] */ long arg_3,
-    /* [in] */ long arg_4,
-    /* [unique][in] */ struct Struct_392_t *arg_5,
-    /* [in] */ long arg_6);
+DWORD EfsRpcQueryRecoveryAgents( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName,
+    /* [out] */ ENCRYPTION_CERTIFICATE_HASH_LIST **RecoveryAgents);
 
-long Proc14_EfsRpcFileKeyInfoEx_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [in] */ struct Struct_136_t *arg_1,
-    /* [in] */ struct Struct_462_t *arg_2);
+DWORD EfsRpcRemoveUsersFromFile( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName,
+    /* [in] */ ENCRYPTION_CERTIFICATE_HASH_LIST *Users);
 
-long Proc15_EfsRpcAddUsersToFileEx_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [in] */ long arg_1,
-    /* [unique][in] */ struct Struct_392_t *arg_2,
-    /* [string][in] */ wchar_t *arg_3,
-    /* [in] */ struct Struct_346_t *arg_4);
+DWORD EfsRpcAddUsersToFile( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName,
+    /* [in] */ ENCRYPTION_CERTIFICATE_LIST *EncryptionCertificates);
 
-long Proc16_EfsRpcFileKeyInfoEx_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [in] */ long arg_1,
-    /* [unique][in] */ struct Struct_392_t *arg_2,
-    /* [string][in] */ wchar_t *arg_3,
-    /* [in] */ long arg_4,
-    /* [ref][out] */ struct Struct_392_t **arg_5);
+void Opnum10NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
 
-long Proc17_EfsRpcFileKeyInfoEx_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [ref][out] */ struct Struct_392_t **arg_1);
+DWORD EfsRpcNotSupported( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *Reserved1,
+    /* [string][in] */ wchar_t *Reserved2,
+    /* [in] */ DWORD dwReserved1,
+    /* [in] */ DWORD dwReserved2,
+    /* [unique][in] */ EFS_RPC_BLOB *Reserved,
+    /* [in] */ BOOL bReserved);
 
-long Proc18_EfsRpcFileKeyInfoEx_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [ref][out] */ struct Struct_392_t **arg_2);
+DWORD EfsRpcFileKeyInfo( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName,
+    /* [in] */ DWORD InfoClass,
+    /* [out] */ EFS_RPC_BLOB **KeyInfo);
 
-long Proc19_EfsRpcFileKeyInfoEx_Downlevel( 
-    /* [in] */ handle_t IDL_handle,
-    /* [string][in] */ wchar_t *arg_1,
-    /* [unique][in] */ struct Struct_392_t *arg_2,
-    /* [in] */ struct Struct_392_t *arg_3,
-    /* [unique][in] */ struct Struct_492_t *arg_4);
+DWORD EfsRpcDuplicateEncryptionInfoFile( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *SrcFileName,
+    /* [string][in] */ wchar_t *DestFileName,
+    /* [in] */ DWORD dwCreationDisposition,
+    /* [in] */ DWORD dwAttributes,
+    /* [unique][in] */ EFS_RPC_BLOB *RelativeSD,
+    /* [in] */ BOOL bInheritHandle);
 
-long Proc20_EfsRpcFlushEfsCache_Downlevel( 
+void Opnum14NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+DWORD EfsRpcAddUsersToFileEx( 
+    /* [in] */ handle_t binding_h,
+    /* [in] */ DWORD dwFlags,
+    /* [unique][in] */ EFS_RPC_BLOB *Reserved,
+    /* [string][in] */ wchar_t *FileName,
+    /* [in] */ ENCRYPTION_CERTIFICATE_LIST *EncryptionCertificates);
+
+DWORD EfsRpcFileKeyInfoEx( 
+    /* [in] */ handle_t binding_h,
+    /* [in] */ DWORD dwFileKeyInfoFlags,
+    /* [unique][in] */ EFS_RPC_BLOB *Reserved,
+    /* [string][in] */ wchar_t *FileName,
+    /* [in] */ DWORD InfoClass,
+    /* [out] */ EFS_RPC_BLOB **KeyInfo);
+
+void Opnum17NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+DWORD EfsRpcGetEncryptedFileMetadata( 
+    /* [in] */ handle_t binding_h,
+    /* [ref][string][in] */ wchar_t *FileName,
+    /* [ref][out] */ EFS_RPC_BLOB **EfsStreamBlob);
+
+DWORD EfsRpcSetEncryptedFileMetadata( 
+    /* [in] */ handle_t binding_h,
+    /* [ref][string][in] */ wchar_t *FileName,
+    /* [unique][in] */ EFS_RPC_BLOB *OldEfsStreamBlob,
+    /* [ref][in] */ EFS_RPC_BLOB *NewEfsStreamBlob,
+    /* [unique][in] */ ENCRYPTED_FILE_METADATA_SIGNATURE *NewEfsSignature);
+
+DWORD EfsRpcFlushEfsCache( 
+    /* [in] */ handle_t binding_h);
+
+long EfsRpcEncryptFileExSrv( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName,
+    /* [unique][string][in] */ wchar_t *ProtectorDescriptor,
+    /* [in] */ unsigned long Flags);
+
+DWORD EfsRpcQueryProtectors( 
+    /* [in] */ handle_t binding_h,
+    /* [string][in] */ wchar_t *FileName,
+    /* [out] */ PENCRYPTION_PROTECTOR_LIST **ppProtectorList);
+
+void Opnum23NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum24NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum25NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum26NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum27NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum28NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum29NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum30NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum31NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum32NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum33NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum34NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum35NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum36NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum37NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum38NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum39NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum40NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum41NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum42NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum43NotUsedOnWire( 
+    /* [in] */ handle_t IDL_handle);
+
+void Opnum44NotUsedOnWire( 
     /* [in] */ handle_t IDL_handle);
 
 
 
-extern RPC_IF_HANDLE DefaultIfName_v1_0_c_ifspec;
-extern RPC_IF_HANDLE DefaultIfName_v1_0_s_ifspec;
-#endif /* __DefaultIfName_INTERFACE_DEFINED__ */
+extern RPC_IF_HANDLE efsrpc_v1_0_c_ifspec;
+extern RPC_IF_HANDLE efsrpc_v1_0_s_ifspec;
+#endif /* __efsrpc_INTERFACE_DEFINED__ */
 
 /* Additional Prototypes for ALL interfaces */
+
+void __RPC_USER PEXIMPORT_CONTEXT_HANDLE_rundown( PEXIMPORT_CONTEXT_HANDLE );
 
 /* end of Additional Prototypes */
 

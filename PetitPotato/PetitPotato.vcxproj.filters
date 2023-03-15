@@ -23,16 +23,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ms-dtyp_h.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ms-efsr_h.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Midl Include="ms-efsr.idl">
-      <Filter>源文件</Filter>
-    </Midl>
+    <ClInclude Include="ms-dtyp_h.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

