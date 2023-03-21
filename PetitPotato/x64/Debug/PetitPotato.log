@@ -1,7 +1,7 @@
 ﻿  ms-efsr_c.c
   PetitPotato.cpp
-C:\Users\whoami\Desktop\PetitPotato\PetitPotato\PetitPotato.cpp(466,1): warning C4326: “wmain”的返回类型应为“int”而非“void”
-C:\Users\whoami\Desktop\PetitPotato\PetitPotato\PetitPotato.cpp(498,16): warning C4473: “printf”: 没有为格式字符串传递足够的参数
-C:\Users\whoami\Desktop\PetitPotato\PetitPotato\PetitPotato.cpp(498,16): message : 占位符和其参数预计 1 可变参数，但提供的却是 0 参数
-C:\Users\whoami\Desktop\PetitPotato\PetitPotato\PetitPotato.cpp(498,16): message : 缺失的可变参数 1 为格式字符串“%i”所需
+C:\Users\whoami\Desktop\PetitPotato\PetitPotato\PetitPotato.cpp(464,1): warning C4326: “wmain”的返回类型应为“int”而非“void”
+C:\Users\whoami\Desktop\PetitPotato\PetitPotato\PetitPotato.cpp(496,16): warning C4473: “printf”: 没有为格式字符串传递足够的参数
+C:\Users\whoami\Desktop\PetitPotato\PetitPotato\PetitPotato.cpp(496,16): message : 占位符和其参数预计 1 可变参数，但提供的却是 0 参数
+C:\Users\whoami\Desktop\PetitPotato\PetitPotato\PetitPotato.cpp(496,16): message : 缺失的可变参数 1 为格式字符串“%i”所需
   PetitPotato.vcxproj -> C:\Users\whoami\Desktop\PetitPotato\x64\Debug\PetitPotato.exe

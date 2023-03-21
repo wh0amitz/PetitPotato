@@ -11,8 +11,6 @@
 #pragma comment(lib, "RpcRT4.lib")
 #pragma comment(lib, "userenv.lib")
 
-using  std::string;
-
 BOOL g_bInteractWithConsole = TRUE;
 
 
