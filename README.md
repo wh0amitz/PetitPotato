@@ -23,7 +23,7 @@ But old PetitPotam does not work on newer versions of Windows due to the limitat
 
 > In December 2021, Microsoft released a patch for a different EFSRPC vulnerability: CVE-2021-43217. As part of the remediation for that issue, Microsoft implemented some hardening measures on EFSRPC communication. In particular, EFSRPC clients would need to use RPC_C_AUTHN_LEVEL_PKT_PRIVACY when using EFSRPC. If the client fails to do so, then the client is rejected and a Windows application event is generated.
 
-At present, the project can perfectly elevate to SYSTEM on Windows 21H2 10.0.20348.1547.
+At present, the project can perfectly elevate to SYSTEM on all versions of Windows (Test on Windows 21H2 10.0.20348.1547).
 
 ## Usage
 
